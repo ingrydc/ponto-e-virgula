@@ -79,27 +79,20 @@
 
     <script type="module">
 
-        // Se estiver usando npm/yarn e imports modulares
-        import { initializeApp } from 'firebase/app';
-        import { getFirestore } from 'firebase/firestore';
-        
-        // Sua configuração do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
         const firebaseConfig = {
-            apiKey: "AIzaSyAbV92EPMuAPmqh6Zyolu1Z9In63M2WA48",
-            authDomain: "ponto-e-virgula-69ea0.firebaseapp.com",
-            projectId: "ponto-e-virgula-69ea0",
-            storageBucket: "ponto-e-virgula-69ea0.firebasestorage.app",
-            messagingSenderId: "340741537478",
-            appId: "1:340741537478:web:eaeef06d7e3226684221c7"
-        };
-        
-        // Inicializa o Firebase
-        const app = initializeApp(firebaseConfig);
-        
-        // Obtém uma instância do Firestore
-        const db = getFirestore(app);
-        
-        // Agora 'db' é a sua referência ao Firestore e você pode começar a usá-lo!
+        apiKey: "AIzaSyAbV92EPMuAPmqh6Zyolu1Z9In63M2WA48",
+        authDomain: "ponto-e-virgula-69ea0.firebaseapp.com",
+        projectId: "ponto-e-virgula-69ea0",
+        storageBucket: "ponto-e-virgula-69ea0.appspot.com",
+        messagingSenderId: "340741537478",
+        appId: "1:340741537478:web:eaeef06d7e3226684221c7"
+            };
+
+        const appFirebase = initializeApp(firebaseConfig);
+        const db = getFirestore(appFirebase);
 
         
         new Vue({
