@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <title>Comments</title>
+    <style>
+        .CommentForm{
+            margin: 30px auto;
+            width: 500px;
+            text-align: center;
+            padding: 10px;
+            flex: 1;
+            background-color: pink;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px #0000005f;
+        }
+        input, textarea{
+            width: 60%;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: solid 1px #aaa;
+        }
+        input:focus, textarea:focus{
+            outline: none;
+        }
+        .CommentList{
+            margin: 30px auto;
+            width: 500px;
+            padding: 10px;
+            flex: 1;
+            background-color: rgb(255, 238, 241);
+            border-radius: 10px;
+        }
+        .avatar{
+            float: left;
+            width: 50px;
+            height: 50px;
+            margin: 10px;
+            border-radius: 50%;
+            background: #d8b8c1;
+        }
+        .autor{
+            margin: 25px 0;
+        }
+        .comentario{
+            margin: 30px 0 0 30px;
+        }
+        .botao{
+            background: rgb(219, 158, 168);
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .botao:hover{
+            background: #aaa;
+            cursor: pointer;
+        }
+        .exc{
+            text-decoration: none;
+            color: #fff;
+            display: block;
+            position: relative;
+            top: 20px;
+            left: 410px;
+            background: #c55;
+            width: 60px;
+            text-align: center;
+            padding: 3px;
+            border-radius: 4px 4px 0px 0;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="app"></div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            template: `
+                <div class="container">
+                    <div class="CommentForm">
+                        <h1>Comments</h1>
+                        <p>
+                           <input type="text" name="usuário" placeholder="User" v-model="nome">
+                        </p>
+                        <p>
+                            <textarea name="message" cols="30" rows="5" placeholder="Post" v-model="comentario"></textarea>
+                        </p>
+                        <button type="submit" class="botao" v-on:click="addComentario()">Post</button>
+                    </div>
+                    <div class="CommentList" v-for="(comentario, index) in comentarios">
+                        <div class="avatar"></div>
+                        <p class="autor"><b>{{comentario.nome}}</b></p>
+                        <p class="comentario">{{comentario.comentario}}</p>
+                        <p><a href="#" class="exc" v-on:click="removerComentario(index)">Excluir</a></p>
+                    </div>
+                </div>
+            `,
+            data() {
+                return {
+                    comentarios: [],
+                    nome: '',
+                    comentario: ''
+                }
+            },
+            created() {
+        // Carregar os comentários do localStorage ao iniciar
+            const comentariosSalvos = localStorage.getItem('comentarios')
+                if (comentariosSalvos) {
+                    this.comentarios = JSON.parse(comentariosSalvos)
+                }
+            },
+            watch: {
+                comentarios: {
+                handler(comentarios) {
+                localStorage.setItem('comentarios', JSON.stringify(comentarios))
+                },
+                deep: true
+                }
+            },
+            methods: {
+
+                addComentario() {
+                    this.comentarios.push({
+                        nome: this.nome,
+                        comentario: this.comentario
+                    })
+                    this.nome = ''
+                    this.comentario = ''
+                },
+                removerComentario(index) {
+                    this.comentarios.splice(index, 1)
+                }
+            }
+        }).$mount('#app')
+    </script>
+
+</body>
+</html>
