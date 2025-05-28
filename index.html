@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comentários</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <title>the ogs 55 are thinking</title>
     <style>
+        /* Seu CSS está mantido igual */
         .CommentForm{
             margin: 30px auto;
             width: 500px;
             text-align: center;
             padding: 10px;
-            flex: 1;
             background-color: pink;
             border-radius: 10px;
             box-shadow: 0px 2px 5px #0000005f;
@@ -30,7 +30,6 @@
             margin: 30px auto;
             width: 500px;
             padding: 10px;
-            flex: 1;
             background-color: rgb(255, 238, 241);
             border-radius: 10px;
         }
@@ -74,46 +73,46 @@
     </style>
 </head>
 <body>
-    
+
     <div id="app"></div>
 
+    <!-- Firebase e Firestore -->
     <script type="module">
-
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
-        apiKey: "AIzaSyAbV92EPMuAPmqh6Zyolu1Z9In63M2WA48",
-        authDomain: "ponto-e-virgula-69ea0.firebaseapp.com",
-        projectId: "ponto-e-virgula-69ea0",
-        storageBucket: "ponto-e-virgula-69ea0.appspot.com",
-        messagingSenderId: "340741537478",
-        appId: "1:340741537478:web:eaeef06d7e3226684221c7"
-            };
+            apiKey: "AIzaSyAbV92EPMuAPmqh6Zyolu1Z9In63M2WA48",
+            authDomain: "ponto-e-virgula-69ea0.firebaseapp.com",
+            projectId: "ponto-e-virgula-69ea0",
+            storageBucket: "ponto-e-virgula-69ea0.appspot.com",
+            messagingSenderId: "340741537478",
+            appId: "1:340741537478:web:eaeef06d7e3226684221c7"
+        };
 
         const appFirebase = initializeApp(firebaseConfig);
         const db = getFirestore(appFirebase);
 
-        
         new Vue({
             el: '#app',
             template: `
                 <div class="container">
                     <div class="CommentForm">
-                        <h1>the ogs 55 are thinking</h1>
+                        <h1>Comentários</h1>
                         <p>
-                           <input type="text" name="usuário" placeholder="User" v-model="nome">
+                           <input type="text" placeholder="User" v-model="nome">
                         </p>
                         <p>
-                            <textarea name="message" cols="30" rows="5" placeholder="Post" v-model="comentario"></textarea>
+                            <textarea cols="30" rows="5" placeholder="Post" v-model="comentario"></textarea>
                         </p>
-                        <button type="submit" class="botao" v-on:click="addComentario()">Post</button>
+                        <button class="botao" @click="addComentario">Postar</button>
                     </div>
-                    <div class="CommentList" v-for="(comentario, index) in comentarios">
+
+                    <div class="CommentList" v-for="(comentario, index) in comentarios" :key="comentario.id">
                         <div class="avatar"></div>
-                        <p class="autor"><b>{{comentario.nome}}</b></p>
-                        <p class="comentario">{{comentario.comentario}}</p>
-                        <p><a href="#" class="exc" v-on:click="removerComentario(index)">Excluir</a></p>
+                        <p class="autor"><b>{{ comentario.nome }}</b></p>
+                        <p class="comentario">{{ comentario.comentario }}</p>
+                        <p><a href="#" class="exc" @click="removerComentario(comentario.id)">Excluir</a></p>
                     </div>
                 </div>
             `,
@@ -125,35 +124,41 @@
                 }
             },
             created() {
-        // Carregar os comentários do localStorage ao iniciar
-            const comentariosSalvos = localStorage.getItem('comentarios')
-                if (comentariosSalvos) {
-                    this.comentarios = JSON.parse(comentariosSalvos)
-                }
-            },
-            watch: {
-                comentarios: {
-                handler(comentarios) {
-                localStorage.setItem('comentarios', JSON.stringify(comentarios))
-                },
-                deep: true
-                }
+                this.getComentariosTempoReal();
             },
             methods: {
-
-                addComentario() {
-                    this.comentarios.push({
+                async addComentario() {
+                    if (this.nome.trim() === '' || this.comentario.trim() === '') {
+                        alert('Preencha todos os campos!');
+                        return;
+                    }
+                    await addDoc(collection(db, "comentarios"), {
                         nome: this.nome,
-                        comentario: this.comentario
-                    })
-                    this.nome = ''
-                    this.comentario = ''
+                        comentario: this.comentario,
+                        criadoEm: new Date()
+                    });
+                    this.nome = '';
+                    this.comentario = '';
                 },
-                removerComentario(index) {
-                    this.comentarios.splice(index, 1)
+                async removerComentario(id) {
+                    await deleteDoc(doc(db, "comentarios", id));
+                },
+                getComentariosTempoReal() {
+                    const colecao = collection(db, "comentarios");
+                    onSnapshot(colecao, (snapshot) => {
+                        const lista = [];
+                        snapshot.forEach(doc => {
+                            lista.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        });
+                        // Ordena pelo mais recente
+                        this.comentarios = lista.sort((a, b) => b.criadoEm?.seconds - a.criadoEm?.seconds);
+                    });
                 }
             }
-        }).$mount('#app')
+        });
     </script>
 
 </body>
